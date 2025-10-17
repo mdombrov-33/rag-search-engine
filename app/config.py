@@ -35,7 +35,8 @@ class Settings(BaseSettings):
     QDRANT_URL: str = "http://localhost:6333"
     QDRANT_COLLECTION: str = "documents"
     QDRANT_API_KEY: Optional[str] = None
-    VECTOR_SIZE: int = 384  # Depends on embedding model; 384 for local-minilm
+    VECTOR_SIZE: int = 384  # Depends on embedding model; 384 for 'local-minilm',
+    # 1536 for OpenAI 'text-embedding-3-small'
 
     # LangFuse
     LANGFUSE_HOST: str = "https://cloud.langfuse.com"
