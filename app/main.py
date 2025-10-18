@@ -1,8 +1,3 @@
-"""
-FastAPI application entry point.
-Provides REST API endpoints for document upload, search, and RAG.
-"""
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
