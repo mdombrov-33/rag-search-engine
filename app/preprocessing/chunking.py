@@ -46,10 +46,8 @@ class RecursiveCharacterTextSplitter:
             if len(split) <= self.chunk_size:
                 good_splits.append(split)
             else:
-                # Recurse with next separator
                 good_splits.extend(self._recursive_split(split, separators[1:]))
 
-        # Merge small chunks
         merged = []
         current = ""
         for split in good_splits:
@@ -158,7 +156,6 @@ class ChunkingStrategy:
             if not cleaned_para:
                 continue
 
-            # Use spaCy to count sentences
             doc = self.nlp(cleaned_para)
             sentence_count = len(list(doc.sents))
 
@@ -184,25 +181,21 @@ class ChunkingStrategy:
         sentences = nltk.sent_tokenize(text)
 
         if len(sentences) <= num_clusters:
-            # Not enough sentences for clustering, return as-is
             return self.sentence_chunking(text, document_id)
 
         # Vectorize sentences
         vectorizer = TfidfVectorizer(stop_words="english")
         X = vectorizer.fit_transform(sentences)
 
-        # Cluster sentences
         kmeans = KMeans(n_clusters=num_clusters, random_state=42, n_init=10)
         clusters = kmeans.fit_predict(X)
 
-        # Group sentences by cluster
         cluster_groups: dict[int, list[str]] = {}
         for i, cluster_id in enumerate(clusters):
             if cluster_id not in cluster_groups:
                 cluster_groups[cluster_id] = []
             cluster_groups[cluster_id].append(sentences[i])
 
-        # Create chunks from clusters
         chunks = []
         for cluster_id, cluster_sentences in cluster_groups.items():
             chunk_text = " ".join(cluster_sentences)

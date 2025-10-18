@@ -23,7 +23,6 @@ class TextCleaner:
         return text
 
     def validate_text(self, text: str, min_length: int = 10) -> bool:
-        """Validate text for processing"""
         if len(text.strip()) < min_length:
             logger.warning(f"Text too short: {len(text)} chars (min: {min_length})")
             return False

@@ -17,8 +17,6 @@ class TextNormalizer:
         self.custom_stopwords: set[str] = set()
         self.cleaner = TextCleaner()
 
-    # Remove clean_text method (moved to TextCleaner)
-
     def lowercase(self, tokens: List[str]) -> List[str]:
         """Convert to lowercase"""
         return [t.lower() for t in tokens]
@@ -26,7 +24,6 @@ class TextNormalizer:
     def lemmatize(self, tokens: List[str], pos_tags: List[str] | None = None) -> List[str]:
         """Lemmatization"""
         if pos_tags:
-            # Context-aware lemmatization using POS tags
             return [
                 self.lemmatizer.lemmatize(token, self._get_wordnet_pos(pos))
                 for token, pos in zip(tokens, pos_tags, strict=False)

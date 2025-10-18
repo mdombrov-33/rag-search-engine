@@ -18,7 +18,6 @@ class ChunkEnricher:
         """Enrich a single chunk with metadata"""
         enriched = chunk_metadata.copy()
 
-        # POS-based enrichment
         pos_dist = self.pos_tagger.get_pos_distribution(chunk_text)
         enriched["pos_distribution"] = pos_dist
 
@@ -26,12 +25,10 @@ class ChunkEnricher:
         enriched["key_nouns"] = nouns_verbs["nouns"][:10]  # Top 10 nouns
         enriched["key_verbs"] = nouns_verbs["verbs"][:5]  # Top 5 verbs
 
-        # Text statistics
         enriched["has_questions"] = "?" in chunk_text
         enriched["has_numbers"] = bool(re.search(r"\d", chunk_text))
         enriched["capitalized_words"] = len([w for w in chunk_text.split() if w.istitle()])
 
-        # Keyword extraction (simple frequency-based)
         words = re.findall(r"\b\w+\b", chunk_text.lower())
         stop_words = {
             "the",
@@ -52,7 +49,6 @@ class ChunkEnricher:
         keywords = [w for w in words if w not in stop_words and len(w) > 3]
         enriched["keywords"] = [k for k, _ in Counter(keywords).most_common(10)]
 
-        # Readability score (simple heuristic)
         avg_word_len = sum(len(w) for w in words) / len(words) if words else 0
         enriched["avg_word_length"] = round(avg_word_len, 2)
 
