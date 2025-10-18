@@ -48,7 +48,51 @@ class SearchResponse(BaseModel):
     """Search response with results"""
 
     query: str
+    enhanced_query: str | None = None
     results: list[SearchResult]
-    total_found: int
-    search_time_ms: int
+    total_results: int
+    search_type: str
+    processing_time_ms: int
     metadata: dict = {}
+
+
+class AddDocumentsResponse(BaseModel):
+    """Response for adding documents to vector store"""
+
+    success: bool
+    documents_added: int
+    total_points: int
+    processing_time_ms: int
+    errors: list[str] = []
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "success": True,
+                "documents_added": 5,
+                "total_points": 25,
+                "processing_time_ms": 150,
+                "errors": [],
+            }
+        }
+
+
+class DeleteDocumentsResponse(BaseModel):
+    """Response for deleting documents from vector store"""
+
+    success: bool
+    documents_deleted: int
+    total_points_remaining: int
+    processing_time_ms: int
+    errors: list[str] = []
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "success": True,
+                "documents_deleted": 3,
+                "total_points_remaining": 22,
+                "processing_time_ms": 50,
+                "errors": [],
+            }
+        }
