@@ -12,7 +12,7 @@ settings = get_settings()
 @lru_cache()
 def get_qdrant_client() -> QdrantClient:
     """Cached Qdrant client"""
-    return QdrantClient(url=settings.QDRANT_URL, timeout=60, https=True, port=443)
+    return QdrantClient(url=settings.QDRANT_URL, timeout=60)
 
 
 @lru_cache()

@@ -25,7 +25,7 @@ class PreprocessingPipeline:
         self,
         text: str,
         document_id: str,
-        chunk_strategy: str | None = None,
+        chunk_strategy: str = "recursive",
         normalize: bool = False,  # Default False for semantic search
     ) -> List[Chunk]:
         """

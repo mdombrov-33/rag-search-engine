@@ -4,8 +4,8 @@ from pathlib import Path
 
 import aiofiles
 import pandas as pd
+import pdfplumber
 from docx import Document as DocxDocument
-from pypdf import PdfReader
 
 from app.config import get_settings
 from app.models.document import ContentType, DocumentMetadata
@@ -46,9 +46,7 @@ class DocumentService:
             chunks = self.pipeline.process_document(text, document_id, normalize=False)
 
             chunk_texts = [chunk.text for chunk in chunks]
-            embeddings = await self.embedding_service.embed_texts(
-                chunk_texts
-            )  # Await the async call
+            embeddings = await self.embedding_service.embed_texts(chunk_texts)
 
             documents = [
                 {
@@ -98,11 +96,13 @@ class DocumentService:
             raise ValueError(f"Unsupported file type: {ext}")
 
     def _extract_pdf(self, file_path: str) -> str:
-        """Extract text from PDF"""
-        reader = PdfReader(file_path)
+        """Extract text from PDF using pdfplumber"""
         text = ""
-        for page in reader.pages:
-            text += page.extract_text() + "\n"
+        with pdfplumber.open(file_path) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
         return text
 
     def _extract_docx(self, file_path: str) -> str:

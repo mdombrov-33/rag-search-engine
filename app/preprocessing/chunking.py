@@ -12,7 +12,7 @@ class RecursiveCharacterTextSplitter:
     """Manual implementation of LangChain's RecursiveCharacterTextSplitter"""
 
     def __init__(
-        self, chunk_size: int = 500, chunk_overlap: int = 100, separators: list[str] | None = None
+        self, chunk_size: int = 1000, chunk_overlap: int = 100, separators: list[str] | None = None
     ):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
