@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from .search import SearchResult
+from app.models.search import SearchResult
 
 
 class RAGRequest(BaseModel):
