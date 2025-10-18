@@ -43,13 +43,20 @@ class DocumentService:
             if not text.strip():
                 raise ValueError("No text extracted from document")
 
+            logger.info(f"Extracted text for {filename}: {len(text)} chars")
+
             chunks = self.pipeline.process_document(text, document_id, normalize=False)
 
             chunk_texts = [chunk.text for chunk in chunks]
+            logger.info(
+                f"Processing {len(chunks)} chunks with texts: {[len(t) for t in chunk_texts]} chars"
+            )
             embeddings = await self.embedding_service.embed_texts(chunk_texts)
 
             documents = [
                 {
+                    "id": str(uuid.uuid4()),
+                    "chunk_id": chunk.chunk_id,
                     "document_id": chunk.document_id,
                     "text": chunk.text,
                     "metadata": chunk.metadata,
@@ -103,6 +110,9 @@ class DocumentService:
                 page_text = page.extract_text()
                 if page_text:
                     text += page_text + "\n"
+        logger.info(
+            f"Extracted text from PDF {file_path}: {len(text)} chars, first 200 chars: {text[:200]}"
+        )
         return text
 
     def _extract_docx(self, file_path: str) -> str:

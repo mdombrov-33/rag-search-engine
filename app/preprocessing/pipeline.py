@@ -42,12 +42,17 @@ class PreprocessingPipeline:
         """
         # 1: Clean text (basic cleaning only for semantic)
         cleaned_text = self.cleaner.clean_text(text)
+        logger.info(f"Document {document_id} cleaned: {len(cleaned_text)} chars")
         # if normalize:  # Uncomment for keyword search later
         #     cleaned_text = self.normalizer.normalize(cleaned_text, strategy="lemmatize")
 
         # 2: Chunk based on strategy
         chunk_strategy = chunk_strategy or settings.CHUNK_STRATEGY
         chunks = self._apply_chunking(cleaned_text, document_id, chunk_strategy)
+
+        logger.info(f"Created {len(chunks)} chunks for document {document_id}")
+        for i, chunk in enumerate(chunks[:3]):
+            logger.info(f"Chunk {i}: {len(chunk.text)} chars - {chunk.text[:100]}...")
 
         # 3: Enrich chunks
         enriched_chunks = []

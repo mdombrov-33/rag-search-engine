@@ -43,11 +43,12 @@ class VectorStore:
             points = []
             for i, (doc, embedding) in enumerate(zip(documents, embeddings, strict=True)):
                 point = PointStruct(
-                    id=doc.get("document_id", f"doc_{i}"),
+                    id=doc.get("id", f"doc_{i}"),
                     vector=embedding,
                     payload={
                         "text": doc.get("text", ""),
                         "document_id": doc.get("document_id", ""),
+                        "chunk_id": doc.get("chunk_id", ""),
                         "metadata": doc.get("metadata", {}),
                     },
                 )
@@ -116,7 +117,7 @@ class VectorStore:
                 payload = result.payload or {}
                 search_results.append(
                     SearchResult(
-                        chunk_id=str(result.id),
+                        chunk_id=payload.get("chunk_id", str(result.id)),
                         text=payload.get("text", ""),
                         score=float(result.score),
                         metadata=payload.get("metadata", {}),
