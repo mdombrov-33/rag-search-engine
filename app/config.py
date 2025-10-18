@@ -1,9 +1,4 @@
-"""
-Application configuration settings
-"""
-
 from functools import lru_cache
-from typing import Optional
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -18,9 +13,9 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"  # development, staging, production
 
     # API Keys
-    OPENAI_API_KEY: Optional[str] = None
-    LANGFUSE_PUBLIC_KEY: Optional[str] = None
-    LANGFUSE_SECRET_KEY: Optional[str] = None
+    OPENAI_API_KEY: str | None = None
+    LANGFUSE_PUBLIC_KEY: str | None = None
+    LANGFUSE_SECRET_KEY: str | None = None
 
     # LLM Configuration
     LLM_MODEL: str = "gpt-5"
@@ -28,15 +23,14 @@ class Settings(BaseSettings):
     MAX_TOKENS: int = 1000
 
     # Embeddings
-    EMBEDDING_PROVIDER: str = "local"  # 'local' or 'openai'
-    EMBEDDING_MODEL: str = "local-minilm"  # Local: 'local-minilm'; OpenAI: 'text-embedding-3-small'
+    EMBEDDING_MODEL: str = "text-embedding-3-small"
 
     # Qdrant
     QDRANT_URL: str = "http://localhost:6333"
     QDRANT_COLLECTION: str = "documents"
-    QDRANT_API_KEY: Optional[str] = None
-    VECTOR_SIZE: int = 384  # Depends on embedding model; 384 for 'local-minilm',
-    # 1536 for OpenAI 'text-embedding-3-small'
+    QDRANT_API_KEY: str | None = None
+    VECTOR_SIZE: int = 1536
+    DISTANCE_METRIC: str = "COSINE"  # COSINE, EUCLID, DOT_PRODUCT
 
     # LangFuse
     LANGFUSE_HOST: str = "https://cloud.langfuse.com"
