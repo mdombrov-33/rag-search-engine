@@ -1,4 +1,3 @@
-# app/services/document_service.py
 import uuid
 from pathlib import Path
 
@@ -25,7 +24,14 @@ class DocumentService:
         self.embedding_service = EmbeddingService()
         self.vector_store = VectorStore()
 
-    async def upload_document(self, file_path: str, filename: str) -> dict:
+    async def upload_document(
+        self,
+        file_path: str,
+        filename: str,
+        chunk_strategy: str = "semantic_sentences",
+        chunk_size: int = 300,
+        chunk_overlap: int = 50,
+    ) -> dict:
         """
         Upload and process a document.
 
@@ -45,7 +51,9 @@ class DocumentService:
 
             logger.info(f"Extracted text for {filename}: {len(text)} chars")
 
-            chunks = self.pipeline.process_document(text, document_id, normalize=False)
+            chunks = self.pipeline.process_document(
+                text, document_id, chunk_strategy=chunk_strategy, normalize=False
+            )
 
             chunk_texts = [chunk.text for chunk in chunks]
             logger.info(

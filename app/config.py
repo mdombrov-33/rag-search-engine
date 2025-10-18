@@ -40,7 +40,9 @@ class Settings(BaseSettings):
     # Basic Processing (for document upload)
     CHUNK_SIZE: int = 1000
     CHUNK_OVERLAP: int = 50
-    CHUNK_STRATEGY: str = "recursive"  # fixed, semantic, recursive, sliding, paragraph
+    CHUNK_STRATEGY: str = (
+        "semantic_sentences"  # fixed, semantic_sentences, recursive, sliding, paragraph
+    )
     MAX_FILE_SIZE: int = 10_000_000  # 10MB
     SUPPORTED_EXTENSIONS: list = [".pdf", ".docx", ".txt", ".csv"]
 

@@ -1,8 +1,7 @@
-# app/main.py
 import os
 import tempfile
 
-from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
@@ -47,6 +46,9 @@ async def init_qdrant(
 @app.post("/upload")
 async def upload_document(
     file: UploadFile = File(...),  # noqa: B008
+    chunk_strategy: str = Form(default="semantic_sentences"),
+    chunk_size: int = Form(default=300),
+    chunk_overlap: int = Form(default=50),
     document_service: DocumentService = Depends(get_document_service),  # noqa: B008
 ) -> dict:
     """
@@ -75,7 +77,9 @@ async def upload_document(
         temp_file_path = temp_file.name
 
     try:
-        result = await document_service.upload_document(temp_file_path, file.filename)
+        result = await document_service.upload_document(
+            temp_file_path, file.filename, chunk_strategy, chunk_size, chunk_overlap
+        )
         return result
     finally:
         os.unlink(temp_file_path)

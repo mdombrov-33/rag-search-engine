@@ -48,7 +48,13 @@ class PreprocessingPipeline:
 
         # 2: Chunk based on strategy
         chunk_strategy = chunk_strategy or settings.CHUNK_STRATEGY
-        chunks = self._apply_chunking(cleaned_text, document_id, chunk_strategy)
+        chunks = self.chunker.chunk_text(
+            text=cleaned_text,
+            strategy=chunk_strategy,
+            document_id=document_id,
+            chunk_size=settings.CHUNK_SIZE,
+            chunk_overlap=settings.CHUNK_OVERLAP,
+        )
 
         logger.info(f"Created {len(chunks)} chunks for document {document_id}")
         for i, chunk in enumerate(chunks[:3]):
@@ -63,25 +69,3 @@ class PreprocessingPipeline:
 
         logger.info(f"Processed document {document_id}: {len(enriched_chunks)} chunks")
         return enriched_chunks
-
-    def _apply_chunking(self, text: str, document_id: str, strategy: str) -> List[Chunk]:
-        """Apply selected chunking strategy"""
-        if strategy == "fixed":
-            return self.chunker.fixed_size_chunking(
-                text, settings.CHUNK_SIZE, settings.CHUNK_OVERLAP, document_id
-            )
-        elif strategy == "semantic":
-            return self.chunker.semantic_chunking(text, document_id=document_id)
-        elif strategy == "recursive":
-            return self.chunker.recursive_character_chunking(
-                text, settings.CHUNK_SIZE, settings.CHUNK_OVERLAP, document_id
-            )
-        elif strategy == "sentence":
-            return self.chunker.sentence_chunking(text, document_id)
-        elif strategy == "sliding":
-            return self.chunker.sliding_window_chunking(text, document_id=document_id)
-        else:
-            logger.warning(f"Unknown chunk strategy '{strategy}'; using fixed")
-            return self.chunker.fixed_size_chunking(
-                text, settings.CHUNK_SIZE, settings.CHUNK_OVERLAP, document_id
-            )

@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, ValidationInfo, field_validator
 
 
 class ContentType(str, Enum):
@@ -12,6 +12,35 @@ class ContentType(str, Enum):
     DOCX = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
     TXT = "text/plain"
     CSV = "text/csv"
+
+
+class UploadRequest(BaseModel):
+    """Document upload request with chunking options"""
+
+    chunk_strategy: str = Field(
+        default="semantic_sentences", description="Chunking strategy to use"
+    )
+    chunk_size: int = Field(
+        default=300, ge=50, le=2000, description="Target chunk size (words for most strategies)"
+    )
+    chunk_overlap: int = Field(
+        default=50, ge=0, le=500, description="Overlap size (for applicable strategies)"
+    )
+
+    @field_validator("chunk_strategy")
+    @classmethod
+    def validate_strategy(cls, v: str) -> str:
+        valid = ["semantic_sentences", "fixed", "recursive", "sentence", "paragraph", "sliding"]
+        if v not in valid:
+            raise ValueError(f"Strategy must be one of: {', '.join(valid)}")
+        return v
+
+    @field_validator("chunk_overlap")
+    @classmethod
+    def validate_overlap(cls, v: int, info: ValidationInfo) -> int:
+        if "chunk_size" in info.data and v >= info.data["chunk_size"]:
+            raise ValueError("chunk_overlap must be less than chunk_size")
+        return v
 
 
 class DocumentMetadata(BaseModel):
