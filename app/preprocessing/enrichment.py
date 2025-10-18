@@ -11,6 +11,8 @@ class ChunkEnricher:
 
     def __init__(self):
         self.pos_tagger = POSTagger()
+        if self.pos_tagger.nlp:
+            self.pos_tagger.nlp.max_length = 2000000
 
     def enrich_chunk(self, chunk_text: str, chunk_metadata: dict[str, Any]) -> dict[str, Any]:
         """Enrich a single chunk with metadata"""
