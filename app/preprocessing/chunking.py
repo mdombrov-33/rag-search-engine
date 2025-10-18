@@ -3,6 +3,7 @@ import spacy
 
 from app.models.document import Chunk
 from app.monitoring.logger import logger
+from app.preprocessing.tokenizer import TokenizationPipeline
 
 nltk.download("punkt", quiet=True)
 nltk.download("punkt_tab", quiet=True)
@@ -20,6 +21,8 @@ class ChunkingStrategy:
             logger.info("✓ spaCy model loaded")
         except OSError:
             logger.warning("spaCy model not found. Run: python -m spacy download en_core_web_sm")
+
+        self.tokenizer = TokenizationPipeline()
 
     def chunk_text(
         self,
@@ -78,7 +81,7 @@ class ChunkingStrategy:
 
         Best for: Resumes, articles, structured documents
         """
-        sentences = nltk.sent_tokenize(text)
+        sentences = self.tokenizer.tokenize_sentences_nltk(text)
         chunks = []
 
         current_sentences: list[str] = []
@@ -90,9 +93,8 @@ class ChunkingStrategy:
             if not sentence:
                 continue
 
-            sentence_words = len(sentence.split())
+            sentence_words = len(self.tokenizer.tokenize_words_nltk(sentence))
 
-            # If adding this sentence exceeds limit, save current chunk
             if current_word_count + sentence_words > max_words and current_sentences:
                 chunk_text = " ".join(current_sentences)
 
@@ -148,7 +150,7 @@ class ChunkingStrategy:
 
         Best for: When you need consistent chunk sizes
         """
-        words = nltk.word_tokenize(text)
+        words = self.tokenizer.tokenize_words_nltk(text)
         chunks = []
 
         if chunk_size <= overlap:
@@ -169,7 +171,7 @@ class ChunkingStrategy:
                     chunk_index=i // step,
                     chunk_type="fixed",
                     word_count=len(chunk_words),
-                    sentence_count=len(nltk.sent_tokenize(chunk_text)),
+                    sentence_count=len(self.tokenizer.tokenize_sentences_nltk(chunk_text)),
                     metadata={
                         "start_word": i,
                         "end_word": i + chunk_size,
@@ -205,8 +207,8 @@ class ChunkingStrategy:
                     text=chunk_text,
                     chunk_index=i,
                     chunk_type="recursive",
-                    word_count=len(chunk_text.split()),
-                    sentence_count=len(nltk.sent_tokenize(chunk_text)),
+                    word_count=len(self.tokenizer.tokenize_words_nltk(chunk_text)),
+                    sentence_count=len(self.tokenizer.tokenize_sentences_nltk(chunk_text)),
                     metadata={
                         "chunk_size_target": chunk_size,
                         "overlap": chunk_overlap,
@@ -226,7 +228,6 @@ class ChunkingStrategy:
         separator = separators[0]
         remaining_separators = separators[1:]
 
-        # Split by current separator
         splits = text.split(separator) if separator else [text]
 
         good_splits = []
@@ -235,7 +236,6 @@ class ChunkingStrategy:
             if not split:
                 continue
 
-            # If split is still too large, try next separator
             if len(split) > chunk_size and remaining_separators:
                 good_splits.extend(self._recursive_split(split, remaining_separators, chunk_size))
             else:
@@ -292,7 +292,7 @@ class ChunkingStrategy:
 
         Best for: Fine-grained search, Q&A systems
         """
-        sentences = nltk.sent_tokenize(text)
+        sentences = self.tokenizer.tokenize_sentences_nltk(text)
         chunks = []
 
         for i, sentence in enumerate(sentences):
@@ -307,7 +307,7 @@ class ChunkingStrategy:
                     text=sentence,
                     chunk_index=i,
                     chunk_type="sentence",
-                    word_count=len(sentence.split()),
+                    word_count=len(self.tokenizer.tokenize_words_nltk(sentence)),
                     sentence_count=1,
                     metadata={"strategy": "sentence"},
                 )
@@ -335,7 +335,7 @@ class ChunkingStrategy:
                 doc = self.nlp(paragraph)
                 sentence_count = len(list(doc.sents))
             else:
-                sentence_count = len(nltk.sent_tokenize(paragraph))
+                sentence_count = len(self.tokenizer.tokenize_sentences_nltk(paragraph))
 
             chunks.append(
                 Chunk(
@@ -344,7 +344,7 @@ class ChunkingStrategy:
                     text=paragraph,
                     chunk_index=chunk_index,
                     chunk_type="paragraph",
-                    word_count=len(paragraph.split()),
+                    word_count=len(self.tokenizer.tokenize_words_nltk(paragraph)),
                     sentence_count=sentence_count,
                     metadata={"strategy": "paragraph"},
                 )
@@ -362,7 +362,7 @@ class ChunkingStrategy:
 
         Best for: Dense coverage, when context overlap is critical
         """
-        words = text.split()
+        words = self.tokenizer.tokenize_words_nltk(text)
         chunks = []
 
         if len(words) < window_size:
@@ -374,7 +374,7 @@ class ChunkingStrategy:
                     chunk_index=0,
                     chunk_type="sliding",
                     word_count=len(words),
-                    sentence_count=len(nltk.sent_tokenize(text)),
+                    sentence_count=len(self.tokenizer.tokenize_sentences_nltk(text)),
                     metadata={
                         "window_size": window_size,
                         "step_size": step_size,
@@ -395,7 +395,7 @@ class ChunkingStrategy:
                     chunk_index=i // step_size,
                     chunk_type="sliding",
                     word_count=len(chunk_words),
-                    sentence_count=len(nltk.sent_tokenize(chunk_text)),
+                    sentence_count=len(self.tokenizer.tokenize_sentences_nltk(chunk_text)),
                     metadata={
                         "window_start": i,
                         "window_end": i + window_size,
