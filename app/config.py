@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     VERSION: str = "1.0.0"
     DEBUG: bool = False
     ENVIRONMENT: str = "development"  # development, staging, production
+    LOG_LEVEL: str = "INFO"
 
     # API Keys
     OPENAI_API_KEY: str | None = None
@@ -30,7 +31,7 @@ class Settings(BaseSettings):
     QDRANT_COLLECTION: str = "documents"
     QDRANT_API_KEY: str | None = None
     VECTOR_SIZE: int = 1536
-    DISTANCE_METRIC: str = "COSINE"  # COSINE, EUCLID, DOT_PRODUCT
+    DISTANCE_METRIC: str = "COSINE"  # COSINE, EUCLID, DOT
 
     # LangFuse
     LANGFUSE_HOST: str = "https://cloud.langfuse.com"
@@ -47,7 +48,6 @@ class Settings(BaseSettings):
     # DEFAULT_SEARCH_LIMIT: int = 5
     # DEFAULT_SEARCH_TYPE: str = "hybrid"  # bm25, semantic, hybrid
     # PROMETHEUS_PORT: int = 9090
-    # LOG_LEVEL: str = "INFO"
 
     model_config = SettingsConfigDict(
         env_file=".env", env_file_encoding="utf-8", case_sensitive=True, extra="ignore"
