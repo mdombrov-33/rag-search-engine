@@ -1,9 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import Settings
+from app.config import get_settings
 
-settings = Settings()
+settings = get_settings()
 
 app = FastAPI(
     title="RAG Search Engine",
@@ -23,4 +23,5 @@ app.add_middleware(
 @app.get("/health")
 async def health_check() -> dict:
     """Health check endpoint."""
+    return {"status": "healthy", "version": settings.VERSION}
     return {"status": "healthy", "version": settings.VERSION}
