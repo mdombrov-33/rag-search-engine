@@ -14,8 +14,8 @@ settings = get_settings()
 class VectorStore:
     """Qdrant vector store operations"""
 
-    def __init__(self, client: QdrantClient):
-        self.client = client
+    def __init__(self, client: QdrantClient | None = None):
+        self.client = client or QdrantClient()
         self.collection_name = settings.QDRANT_COLLECTION
 
     def add_documents(
