@@ -24,4 +24,3 @@ app.add_middleware(
 async def health_check() -> dict:
     """Health check endpoint."""
     return {"status": "healthy", "version": settings.VERSION}
-    return {"status": "healthy", "version": settings.VERSION}
