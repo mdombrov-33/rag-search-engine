@@ -1,9 +1,9 @@
 import logging
 import sys
 
-from config import Settings
+from app.config import get_settings
 
-settings = Settings()
+settings = get_settings()
 
 
 def configure_logger(name: str = "rag-search-engine") -> logging.Logger:
