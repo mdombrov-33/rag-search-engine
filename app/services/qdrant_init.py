@@ -15,6 +15,7 @@ class QdrantInitializer:
         self.client = client
         self.collection_name = settings.QDRANT_COLLECTION
         self.vector_size = settings.VECTOR_SIZE
+        self.distance = settings.distance
 
     def initialize_collection(self, recreate: bool = False) -> bool:
         """
@@ -42,14 +43,13 @@ class QdrantInitializer:
                     logger.error(f"Qdrant API error while deleting collection: {e}")
                     return False
 
-            # Create collection
             logger.info(f"Creating collection '{self.collection_name}'...")
             try:
                 self.client.create_collection(
                     collection_name=self.collection_name,
                     vectors_config=VectorParams(
                         size=self.vector_size,
-                        distance=Distance.COSINE,
+                        distance=self.distance,
                     ),
                 )
             except UnexpectedResponse as e:

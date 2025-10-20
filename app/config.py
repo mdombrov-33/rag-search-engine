@@ -1,6 +1,7 @@
 from functools import lru_cache
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from qdrant_client.models import Distance
 
 
 class Settings(BaseSettings):
@@ -31,7 +32,7 @@ class Settings(BaseSettings):
     QDRANT_COLLECTION: str = "documents"
     QDRANT_API_KEY: str | None = None
     VECTOR_SIZE: int = 1536
-    DISTANCE_METRIC: str = "COSINE"  # COSINE, EUCLID, DOT
+    DISTANCE_METRIC: str = "Distance.COSINE"  # COSINE, EUCLID, DOT
 
     # LangFuse
     LANGFUSE_HOST: str = "https://cloud.langfuse.com"
@@ -62,6 +63,16 @@ class Settings(BaseSettings):
     @property
     def is_development(self) -> bool:
         return self.ENVIRONMENT == "development"
+
+    @property
+    def distance(self) -> Distance:
+        """Convert string to Distance enum"""
+        distance_map = {
+            "COSINE": Distance.COSINE,
+            "EUCLID": Distance.EUCLID,
+            "DOT": Distance.DOT,
+        }
+        return distance_map.get(self.DISTANCE_METRIC.upper(), Distance.COSINE)
 
 
 @lru_cache()
